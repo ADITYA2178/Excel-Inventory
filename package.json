@@ -1,7 +1,13 @@
 {
   "name": "excel-inventory",
   "version": "0.1.0",
-  "private": true,
+  "description": "Spreadsheet grid for inventory-style sheets",
+  "author": "ADITYA JAISWAL",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ADITYA2178/Excel-Inventory.git"
+  },
   "type": "module",
   "files": ["dist"],
   "main": "./dist/index.js",
