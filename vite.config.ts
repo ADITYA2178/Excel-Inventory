@@ -6,6 +6,7 @@ import { resolve } from 'node:path';
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   build: {
+    emptyOutDir: false,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'ExcelInventory',
