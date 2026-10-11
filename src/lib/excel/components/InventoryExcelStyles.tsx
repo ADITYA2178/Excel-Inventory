@@ -29,6 +29,14 @@ const InventoryExcelStyles: React.FC = () => {
           box-shadow: inset 0 1px 0 #ffffff;
         }
 
+        .inventory-excel-grid .ag-theme-alpine,
+        .inventory-excel-grid .ag-theme-alpine .ag-root-wrapper,
+        .inventory-excel-grid .ag-theme-alpine .ag-root-wrapper-body,
+        .inventory-excel-grid .ag-theme-alpine .ag-root {
+          height: 100%;
+          width: 100%;
+        }
+
         .inventory-excel-grid .ag-theme-alpine .ag-root-wrapper {
           border: 0;
           border-radius: 12px;
@@ -58,43 +66,61 @@ const InventoryExcelStyles: React.FC = () => {
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom {
-          border-top: 1px solid #e9eaeb;
-          background-color: #ffffff;
+          border-top: 1px solid #e7edf5;
+          background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
           position: relative;
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom .ag-row {
           position: relative;
-          background-color: #ffffff;
+          background-color: transparent;
           border-bottom: 0;
           cursor: pointer;
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom::before {
-          content: '+  Add Row';
+          content: '+   Add row';
           position: absolute;
           left: 50%;
           top: 50%;
           z-index: 2;
-          color: #1d4ed8;
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          line-height: 1;
+          display: inline-flex;
+          align-items: center;
+          height: 22px;
+          padding: 0 12px;
+          border: 1px solid #dbe3ee;
+          border-radius: 999px;
+          background: #ffffff;
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+          color: #334155;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+          line-height: 22px;
           pointer-events: none;
-          text-transform: uppercase;
+          white-space: nowrap;
           transform: translate(-50%, -50%);
+          transition: border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+          animation: inventory-row-pill-in 520ms cubic-bezier(0.22, 1, 0.36, 1) both, inventory-pill-glow 3.8s ease-in-out 0.7s infinite;
+        }
+
+        .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom:hover::before {
+          border-color: #bfdbfe;
+          background: #f8fbff;
+          color: #1d4ed8;
+          box-shadow: 0 4px 10px rgba(37, 99, 235, 0.12);
+          animation: none;
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom .ag-cell {
-          background-color: #ffffff;
+          background-color: transparent;
           border-left: 0 !important;
           border-right: 0 !important;
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom .ag-row:hover .ag-cell,
         .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom .ag-row:hover .inventory-add-row-cell {
-          background: #eff6ff !important;
+          background: transparent !important;
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-cell.inventory-add-row-cell {
@@ -198,31 +224,60 @@ const InventoryExcelStyles: React.FC = () => {
           bottom: var(--ag-row-height, 30px);
           z-index: 4;
           display: flex;
-          width: 48px;
+          width: 52px;
           align-items: center;
           justify-content: center;
           border: 0;
-          background: transparent;
-          color: #1d4ed8;
+          border-left: 1px solid #e7edf5;
+          background: linear-gradient(180deg, #f8fafc 0%, #ffffff 70%);
+          color: #334155;
           cursor: pointer;
           padding: 0;
-          transition: background-color 120ms ease, color 120ms ease;
         }
 
         .inventory-excel-grid .ag-theme-alpine .inventory-add-column-fixed-rail:hover {
-          background: #eff6ff;
-          color: #1e40af;
+          background: linear-gradient(180deg, #f8fbff 0%, #ffffff 70%);
+        }
+
+        .inventory-excel-grid .ag-theme-alpine .inventory-add-column-fixed-rail:focus-visible {
+          outline: none;
+        }
+
+        .inventory-excel-grid .ag-theme-alpine .inventory-add-column-fixed-rail:focus-visible .inventory-add-column-fixed-label {
+          border-color: #93c5fd;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
         }
 
         .inventory-excel-grid .ag-theme-alpine .inventory-add-column-fixed-label {
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.08em;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          min-height: 28px;
+          padding: 12px 7px;
+          border: 1px solid #dbe3ee;
+          border-radius: 999px;
+          background: #ffffff;
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+          color: #334155;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
           line-height: 1;
           pointer-events: none;
-          text-transform: uppercase;
-          transform: rotate(180deg);
+          text-transform: none;
           writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          transition: border-color 160ms ease, color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+          animation: inventory-column-pill-in 560ms cubic-bezier(0.22, 1, 0.36, 1) 120ms both, inventory-pill-glow 3.8s ease-in-out 0.9s infinite;
+        }
+
+        .inventory-excel-grid .ag-theme-alpine .inventory-add-column-fixed-rail:hover .inventory-add-column-fixed-label {
+          border-color: #bfdbfe;
+          background: #f8fbff;
+          color: #1d4ed8;
+          box-shadow: 0 4px 10px rgba(37, 99, 235, 0.12);
+          animation: none;
         }
 
         .inventory-excel-grid .ag-theme-alpine .ag-cell.inventory-add-column-cell.ag-cell-focus {
@@ -321,6 +376,140 @@ const InventoryExcelStyles: React.FC = () => {
         .inventory-excel-grid.is-column-popover-open .ag-theme-alpine .ag-body-horizontal-scroll-viewport,
         .inventory-excel-grid.is-column-popover-open .ag-theme-alpine .ag-body-vertical-scroll-viewport {
           overflow: hidden !important;
+        }
+
+        .inventory-rise {
+          animation: inventory-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .inventory-fade-in {
+          animation: inventory-fade 420ms ease 80ms both;
+        }
+
+        .inventory-toolbar button {
+          transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        .inventory-toolbar button:hover:not(:disabled) {
+          transform: translateY(-1px);
+        }
+
+        .inventory-drop {
+          animation: inventory-drop 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .inventory-toast-in {
+          animation: inventory-toast-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .inventory-fade {
+          animation: inventory-fade 180ms ease both;
+        }
+
+        .inventory-pop {
+          animation: inventory-pop 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        @keyframes inventory-rise {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes inventory-drop {
+          from {
+            opacity: 0;
+            transform: translateY(-6px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes inventory-row-pill-in {
+          from {
+            opacity: 0;
+            transform: translate(-50%, -36%) scale(0.94);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+          }
+        }
+
+        @keyframes inventory-column-pill-in {
+          from {
+            opacity: 0;
+            transform: rotate(180deg) scale(0.92);
+          }
+          to {
+            opacity: 1;
+            transform: rotate(180deg) scale(1);
+          }
+        }
+
+        @keyframes inventory-pill-glow {
+          0%,
+          100% {
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+          }
+          50% {
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
+          }
+        }
+
+        @keyframes inventory-toast-in {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes inventory-fade {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes inventory-pop {
+          from {
+            opacity: 0;
+            transform: translateY(8px) scale(0.98);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .inventory-rise,
+          .inventory-fade-in,
+          .inventory-drop,
+          .inventory-toast-in,
+          .inventory-fade,
+          .inventory-pop,
+          .inventory-excel-grid .ag-theme-alpine .ag-floating-bottom::before,
+          .inventory-excel-grid .ag-theme-alpine .inventory-add-column-fixed-label {
+            animation: none;
+          }
+
+          .inventory-toolbar button:hover:not(:disabled) {
+            transform: none;
+          }
         }
 
         @media (orientation: landscape) {

@@ -47,7 +47,7 @@ export const ToastViewport: React.FC = () => {
         <div
           key={item.id}
           role='status'
-          className={`pointer-events-auto rounded-lg px-3 py-2 text-sm text-white shadow-lg ${item.tone === 'error' ? 'bg-red-600' : 'bg-slate-900'}`}
+          className={`inventory-toast-in pointer-events-auto rounded-lg px-3 py-2 text-sm text-white shadow-lg ${item.tone === 'error' ? 'bg-red-600' : 'bg-slate-900'}`}
         >
           {item.message}
         </div>

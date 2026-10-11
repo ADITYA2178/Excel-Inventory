@@ -70,7 +70,7 @@ const InventoryExcelToolbar: React.FC<InventoryExcelToolbarProps> = ({
         : 'Find & replace';
 
   return (
-    <div className='relative flex flex-col gap-2 bg-white px-4 py-3'>
+    <div className='inventory-toolbar relative flex flex-col gap-2 bg-white px-4 py-3'>
       <div className='flex flex-wrap items-center justify-between gap-3'>
         <div className='flex min-w-0 flex-1 flex-wrap items-center gap-3'>
           <div className='flex min-w-[320px] max-w-[520px] flex-1 items-center gap-2'>
@@ -127,7 +127,7 @@ const InventoryExcelToolbar: React.FC<InventoryExcelToolbarProps> = ({
       </div>
 
       {isSearchPanelOpen ? (
-        <div className='flex w-full items-center gap-2 rounded-lg border border-blue-100 bg-white px-2.5 py-2 shadow-sm'>
+        <div className='inventory-drop flex w-full items-center gap-2 rounded-lg border border-blue-100 bg-white px-2.5 py-2 shadow-sm'>
           <div className='flex shrink-0 items-center gap-2 pr-1'>
             <Search className='h-4 w-4 text-gray-400' aria-hidden />
             <span className='text-sm font-medium text-gray-700'>Search</span>

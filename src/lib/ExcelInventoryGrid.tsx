@@ -22,7 +22,6 @@ import {
   ADD_COLUMN_FIELD,
   ColumnSettingsPopover,
   type ColumnSettingsState,
-  DATA_COLUMN_DEFAULT_WIDTH,
   DEFAULT_COLS,
   DEFAULT_ROWS,
   FormulaBuilderPanel,
@@ -218,6 +217,7 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
   const lastHeaderClickRef = React.useRef<{ colKey: string; timestamp: number }>({ colKey: '', timestamp: 0 });
   const skipNextHeaderSelectionRef = React.useRef(false);
   const hasManualColumnResizeRef = React.useRef(false);
+  const rowCountRef = React.useRef(rawMatrix.length);
   const shouldSkipNextFocusedSyncRef = React.useRef(false);
   const isCellRefreshScheduledRef = React.useRef(false);
   const cellLockTooltipTimerRef = React.useRef<number | null>(null);
@@ -677,17 +677,53 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
     const api = gridApiRef.current;
     if (!api || !columnKeys.length) return;
     if (hasManualColumnResizeRef.current) return;
-    const viewportWidth = gridRootRef.current?.clientWidth ?? 0;
-    const minimumColumnsWidth = columnKeys.length * DATA_COLUMN_DEFAULT_WIDTH;
-    if (viewportWidth > minimumColumnsWidth) {
-      api.sizeColumnsToFit();
-    }
+    api.sizeColumnsToFit();
   }, [columnKeys.length]);
+
+  const fillGridToViewport = React.useCallback(() => {
+    const root = gridRootRef.current;
+    if (!root || !columnKeys.length) return;
+    const headerHeight = 34;
+    const pinnedRowHeight = 30;
+    const availableHeight = root.clientHeight - headerHeight - pinnedRowHeight;
+    if (availableHeight <= 0) return;
+    const neededRows = Math.max(1, Math.floor(availableHeight / 30));
+    if (rowCountRef.current >= neededRows) return;
+    const missingRows = neededRows - rowCountRef.current;
+    rowCountRef.current = neededRows;
+    const seedRow = columnKeys.map((colKey) => columnFormulaByKey[colKey] ?? '');
+    setRawMatrix((prev) => {
+      if (prev.length >= neededRows) return prev;
+      const extras = Array.from({ length: missingRows }, () => [...seedRow]);
+      return [...prev, ...extras];
+    });
+    setRowIds((prev) => {
+      if (prev.length >= neededRows) return prev;
+      return [...prev, ...Array.from({ length: missingRows }, () => null)];
+    });
+  }, [columnFormulaByKey, columnKeys]);
+
+  React.useEffect(() => {
+    rowCountRef.current = rawMatrix.length;
+  }, [rawMatrix.length]);
 
   React.useEffect(() => {
     hasSizedColumnsRef.current = false;
     hasManualColumnResizeRef.current = false;
   }, [columnKeys.length]);
+
+  React.useEffect(() => {
+    const root = gridRootRef.current;
+    if (!root) return;
+    const syncGridToViewport = () => {
+      fillGridToViewport();
+      sizeGridColumnsToFit();
+    };
+    syncGridToViewport();
+    const observer = new ResizeObserver(syncGridToViewport);
+    observer.observe(root);
+    return () => observer.disconnect();
+  }, [fillGridToViewport, sizeGridColumnsToFit]);
 
   const staticHeaderSet = React.useMemo(() => new Set((staticHeaders ?? []).map((header) => normalizeHeaderKey(header))), [staticHeaders]);
 
@@ -1684,9 +1720,9 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
   ]);
 
   return (
-    <div className='flex h-screen min-h-0 w-full flex-col gap-4 bg-white p-4'>
+    <div className='flex h-dvh min-h-0 w-full flex-col overflow-hidden bg-white'>
       <ToastViewport />
-      <div className='flex items-center justify-between gap-3'>
+      <div className='inventory-rise flex shrink-0 items-center justify-between gap-3 px-4 py-3'>
         <div className='flex items-center'>
           {onBack ? (
             <Button className='hover:bg-transparent px-0' onClick={onBack} variant='tertiary' size='small' data-testid='cancel-inventory-sheet-button'>
@@ -1703,7 +1739,7 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
           icon
           disabled={isSubmittingImport}
           onClick={handleSave}
-          className='inline-flex h-9 flex-row flex-nowrap items-center justify-center gap-2 whitespace-nowrap bg-blue-600 px-4 text-white hover:bg-blue-700'
+          className='inline-flex h-9 flex-row flex-nowrap items-center justify-center gap-2 whitespace-nowrap bg-blue-600 px-4 text-white shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:bg-blue-700 hover:shadow-md'
         >
           <Download className='h-4 w-4 shrink-0' aria-hidden />
           <span className='leading-none'>{isSubmittingImport ? 'Saving...' : 'Save & Download'}</span>
@@ -1711,7 +1747,7 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
       </div>
 
       <section
-        className={`inventory-excel-grid relative flex min-h-0 flex-1 w-full flex-col overflow-hidden rounded-xl border border-[#D9E1EF] bg-gradient-to-b from-[#FBFDFF] to-white shadow-[0_12px_28px_rgba(15,23,42,0.08)] ${columnSettingsState.open ? 'is-column-popover-open' : ''}`}
+        className={`inventory-excel-grid inventory-fade-in relative flex min-h-0 w-full flex-1 flex-col overflow-hidden border-t border-[#D9E1EF] bg-white ${columnSettingsState.open ? 'is-column-popover-open' : ''}`}
       >
         <InventoryExcelStyles />
         <InventoryExcelToolbar
@@ -1740,15 +1776,16 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
         />
 
         <div
-          className='relative grid min-h-0 flex-1 px-4 pb-4 transition-[grid-template-columns,gap] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]'
+          className='relative grid h-full min-h-0 min-w-0 flex-1 transition-[grid-template-columns,gap] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]'
           style={{
             gridTemplateColumns: isFormulaPanelOpen ? 'minmax(0, 1fr) 380px' : 'minmax(0, 1fr) 0px',
+            gridTemplateRows: 'minmax(0, 1fr)',
             gap: isFormulaPanelOpen ? '0.75rem' : '0rem',
           }}
         >
           <div
             ref={gridRootRef}
-            className='ag-theme-alpine h-full min-h-0 min-w-0 flex-1 bg-white'
+            className='ag-theme-alpine h-full min-h-0 w-full min-w-0 bg-white'
             tabIndex={0}
             onMouseUpCapture={(event) => {
               if (isElementInsideActionMenu(event.target)) return;
@@ -1791,7 +1828,7 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
               aria-label='Add a new column'
               title='Add column'
             >
-              <span className='inventory-add-column-fixed-label'>+ Add Column</span>
+              <span className='inventory-add-column-fixed-label'>+ Add column</span>
             </button>
             <AgGridReact<GridRow>
               rowData={rowData}
@@ -1802,13 +1839,14 @@ const ExcelInventoryGrid: React.FC<ExcelInventoryGridProps> = ({
               onGridReady={(event: GridReadyEvent<GridRow>) => {
                 gridApiRef.current = event.api;
                 requestAnimationFrame(() => {
-                  if (hasSizedColumnsRef.current) return;
+                  fillGridToViewport();
                   sizeGridColumnsToFit();
                   hasSizedColumnsRef.current = true;
                 });
               }}
               onGridSizeChanged={() => {
-                // Keep user-resized widths stable; avoid repeated auto-fit on container changes.
+                fillGridToViewport();
+                sizeGridColumnsToFit();
               }}
               stopEditingWhenCellsLoseFocus
               singleClickEdit

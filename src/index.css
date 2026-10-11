@@ -6,3 +6,24 @@ body,
   height: 100%;
   margin: 0;
 }
+
+body {
+  background: linear-gradient(180deg, #eef4ff 0%, #ffffff 32%, #f8fbff 100%);
+  background-size: 100% 180%;
+  animation: inventory-page-wash 14s ease-in-out infinite alternate;
+}
+
+@keyframes inventory-page-wash {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    animation: none;
+  }
+}
